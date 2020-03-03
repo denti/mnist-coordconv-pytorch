@@ -73,14 +73,19 @@ def main():
         graph.node.remove(n)
     
     # insert AC nodes 
-    for i, _ in enumerate(graph.node):
-        # Create an ac node
-        node_ac = onnx.NodeProto()
-        node_ac.op_type = "CoordConvAC"
-        node_ac.output.insert(0, f"ac_output_{i}")
-        node_ac.input.insert(0, graph.node[i].input[0])
-        graph.node[i].input[0] = f"ac_output_{i}"
-        graph.node.insert(i, node_ac)
+    i = 0
+    while i < len(graph.node):
+        if graph.node[i].op_type == COORD_CONV_OP_TYPE:
+            print('here')
+            # Create an ac node
+            node_ac = onnx.NodeProto()
+            node_ac.op_type = "CoordConvAC"
+            node_ac.output.insert(0, f"ac_output_{i}")
+            node_ac.input.insert(0, graph.node[i].input[0])
+            graph.node[i].input[0] = f"ac_output_{i}"
+            graph.node.insert(i, node_ac)
+            i += 1
+        i += 1
 
     # Generate model_cropped from modified graph
     model_cropped = onnx.helper.make_model(graph)
